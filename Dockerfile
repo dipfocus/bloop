@@ -8,8 +8,14 @@ COPY client/ client
 COPY playwright.config.js .
 RUN npm run build-web
 
-FROM rust:1.73-slim-bookworm as builder
+FROM rust:1.80.1-slim-bookworm as builder
 WORKDIR /build
+
+# 手动创建 /etc/apt/sources.list 并使用清华源
+RUN echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian bookworm main contrib non-free" > /etc/apt/sources.list && \
+    echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main contrib non-free" >> /etc/apt/sources.list && \
+    echo "deb https://mirrors.tuna.tsinghua.edu.cn/debian bookworm-updates main contrib non-free" >> /etc/apt/sources.list
+
 RUN apt-get update && \
     apt-get -y install make clang libc-dev curl cmake python3 protobuf-compiler pkg-config libssl3 libssl-dev git && \
     rm -rf /var/lib/apt/lists/* && \
